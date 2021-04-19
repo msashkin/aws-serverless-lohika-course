@@ -37,3 +37,25 @@ export AWS_PROFILE="serverless"
 ```
 
 Now everything is set to execute all the serverless CLI options like `sls deploy`
+
+## Testing Lambdas
+
+[How to Test Serverless Applications](https://www.serverless.com/blog/how-test-serverless-applications)
+
+Local Lambda invocation
+
+```sh
+serverless invoke local -f myFunction -p myEvent.json
+```
+
+Remote Lambda invocation
+
+```sh
+serverless invoke -f myFunction -p myEvent.json
+```
+
+Investigating Internal Server Errors by using tailing logs
+
+```sh
+serverless logs -f myFunction --tail
+```
