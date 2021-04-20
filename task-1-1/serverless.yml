@@ -1,0 +1,89 @@
+service: task-1-1
+
+frameworkVersion: '2'
+
+custom:
+  dynamoDbTable: ${self:service}-${opt:stage, self:provider.stage}
+
+provider:
+  name: aws
+  runtime: java8
+  stage: dev # Set the default stage used. Default is dev
+  region: us-east-1 # Overwrite the default region used. Default is us-east-1
+  #  stackName: my-custom-stack-name-${opt:stage, self:provider.stage, 'dev'} # Overwrite default CloudFormation stack name. Default is ${self:service}-${opt:stage, self:provider.stage, 'dev'}
+  #  apiName: my-custom-api-gateway-name-${opt:stage, self:provider.stage, 'dev'} # Overwrite default API Gateway name. Default is ${opt:stage, self:provider.stage, 'dev'}-${self:service}
+  lambdaHashingVersion: 20201221
+  # for Java apps memorySize: 512+ should be set or Bad Gateway error will be thrown
+  memorySize: 512 # Overwrite the default memory size. Default is 1024
+  timeout: 20
+  environment:
+    DYNAMODB_TABLE: ${self:custom.dynamoDbTable}
+  iam:
+    role:
+      statements: # permissions for all of your functions can be set here
+        - Effect: Allow
+          Action:
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+          Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}"
+
+package:
+  artifact: target/task-1-1-0.0.1.jar
+
+functions:
+  getTracks:
+    handler: com.serverless.GetTracksHandler
+    events:
+      - http:
+          path: /tracks
+          method: get
+
+  createTrack:
+    handler: com.serverless.CreateTrackHandler
+    events:
+      - http:
+          path: /tracks
+          method: post
+
+  deleteTrack:
+    handler: com.serverless.DeleteTrackHandler
+    events:
+      - http:
+          path: /tracks/{id}
+          method: delete
+
+resources:
+  Resources:
+    tracksTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.dynamoDbTable}
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+          - AttributeName: title
+            AttributeType: S
+          - AttributeName: artist
+            AttributeType: S
+        GlobalSecondaryIndexes:
+          - IndexName: GSI
+            KeySchema:
+              - AttributeName: title
+                KeyType: HASH
+              - AttributeName: artist
+                KeyType: RANGE
+            Projection:
+              ProjectionType: KEYS_ONLY
+            ProvisionedThroughput:
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 5
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 5
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH

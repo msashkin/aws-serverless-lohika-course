@@ -1,0 +1,49 @@
+service: task-1-2
+
+frameworkVersion: '2'
+
+custom:
+  jsonBucket: msaschin-aws-serverless-lohika-course-task-1-2
+  jsonContentsQueueName: ${self:service}-${opt:stage, self:provider.stage}
+
+provider:
+  name: aws
+  runtime: java8
+  stage: dev # Set the default stage used. Default is dev
+  region: us-east-1 # Overwrite the default region used. Default is us-east-1
+  #  stackName: my-custom-stack-name-${opt:stage, self:provider.stage, 'dev'} # Overwrite default CloudFormation stack name. Default is ${self:service}-${opt:stage, self:provider.stage, 'dev'}
+  #  apiName: my-custom-api-gateway-name-${opt:stage, self:provider.stage, 'dev'} # Overwrite default API Gateway name. Default is ${opt:stage, self:provider.stage, 'dev'}-${self:service}
+  lambdaHashingVersion: 20201221
+  # for Java apps memorySize: 512+ should be set or Bad Gateway error will be thrown
+  memorySize: 512 # Overwrite the default memory size. Default is 1024
+  timeout: 20
+  environment:
+    QUEUE_URL: { Ref: jsonContentsQueue }
+    S3_REGION: ${self:provider.region}
+  iam:
+    role:
+      statements: # permissions for all of your functions can be set here
+        - Effect: Allow
+          Action:
+            - s3:GetObject
+          Resource: "arn:aws:s3:::${self:custom.jsonBucket}/*"
+        - Effect: Allow
+          Action:
+            - sqs:SendMessage
+          Resource: arn:aws:sqs:*:*:${self:custom.jsonContentsQueueName}
+
+package:
+  artifact: target/task-1-2-0.0.1.jar
+
+functions:
+  sendJsonContentsFromS3ToSqs:
+    handler: com.serverless.SendJsonContentsFromS3ToSqs
+    events:
+      - s3: ${self:custom.jsonBucket} # Serverless framework creates this bucket on its own, no manual bucket creation is needed. Event type: ObjectCreated is by default.
+
+resources:
+  Resources:
+    jsonContentsQueue:
+      Type: "AWS::SQS::Queue"
+      Properties:
+        QueueName: ${self:custom.jsonContentsQueueName}
