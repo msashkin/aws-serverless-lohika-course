@@ -1,0 +1,22 @@
+name: Java CI with Maven
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up JDK 8
+      uses: actions/setup-java@v2
+      with:
+        java-version: '8'
+        distribution: 'adopt'
+
+    - name: Build with Maven Task 1-1
+      run: mvn -B package --file task-1-1/pom.xml
+
+    - name: Build with Maven Task 1-2
+      run: mvn -B package --file task-1-2/pom.xml
