@@ -1,0 +1,7 @@
+POST {{host}}/tracks
+Content-Type: application/json
+
+{
+  "title": "Test Track Title",
+  "artist": "Test Track Artist"
+}
