@@ -20,3 +20,12 @@ jobs:
 
     - name: Build with Maven Task 1-2
       run: mvn -B package --file task-1-2/pom.xml
+
+    - name: Install with Maven Task 2-1
+      run: mvn -B install --file task-2/services/api-dynamodb-service/pom.xml
+
+    - name: Build with Maven Task 2-2
+      run: mvn -B package --file task-2/services/s3-sqs-service/pom.xml
+
+    - name: Build with Maven Task 2-3
+      run: mvn -B package --file task-2/services/sqs-dynamodb-service/pom.xml
