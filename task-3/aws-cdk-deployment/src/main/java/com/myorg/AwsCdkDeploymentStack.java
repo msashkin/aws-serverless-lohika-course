@@ -15,8 +15,8 @@ public class AwsCdkDeploymentStack extends Stack {
         super(scope, id, props);
 
         // The code that defines your stack goes here
-
-        Bucket.Builder.create(this, "msaschin-test-bucket")
-                      .build();
+//
+//        Bucket.Builder.create(this, "msaschin-test-bucket")
+//                      .build();
     }
 }
