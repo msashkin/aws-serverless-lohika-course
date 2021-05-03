@@ -12,7 +12,10 @@ It is a [Maven](https://maven.apache.org/) based project, so you can open this p
  * `cdk ls`          list all stacks in the app
  * `cdk synth`       emits the synthesized CloudFormation template
  * `cdk deploy`      deploy this stack to your default AWS account/region
+ * `cdk deploy -c accountId=<account_id> -c region=<region>` deploy this stack using custom AWS account/region
  * `cdk diff`        compare deployed stack with current state
  * `cdk docs`        open CDK documentation
+ * `cdk destroy`     destroy the stack using your default AWS account/region
+ * `cdk destroy -c accountId=<account_id> -c region=<region>` destroy the stack using custom AWS account/region
 
 Enjoy!
