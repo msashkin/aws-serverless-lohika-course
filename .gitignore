@@ -220,3 +220,7 @@ buildNumber.properties
 *.code-workspace
 
 # End of https://www.toptal.com/developers/gitignore/api/jetbrains+all,eclipse,vscode,code-java,maven,macos,serverless
+
+# CDK asset staging directory
+.cdk.staging
+cdk.out
